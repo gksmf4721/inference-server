@@ -1,7 +1,11 @@
+from datetime import datetime
+
 import onnxruntime as ort
 import os
 from PIL import Image
 import numpy as np
+from backend.config.dbConn import insert, select
+
 
 # Softmax 함수
 def softmax(x, temperature=1.0):
@@ -16,7 +20,7 @@ session = ort.InferenceSession(model_path)
 CIFAR100_CLASSES = ['apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee', 'beetle', 'bicycle', 'bottle', 'bowl', 'boy', 'bridge', 'bus', 'butterfly', 'camel', 'can', 'castle', 'caterpillar', 'cattle', 'chair', 'chimpanzee', 'clock', 'cloud', 'cockroach', 'couch', 'crab', 'crocodile', 'cup', 'dinosaur', 'dolphin', 'elephant', 'flatfish', 'forest', 'fox', 'girl', 'hamster', 'house', 'kangaroo', 'keyboard', 'lamp', 'lawn_mower', 'leopard', 'lion', 'lizard', 'lobster', 'man', 'maple_tree', 'motorcycle', 'mountain', 'mouse', 'mushroom', 'oak_tree', 'orange', 'orchid', 'otter', 'palm_tree', 'pear', 'pickup_truck', 'pine_tree', 'plain', 'plate', 'poppy', 'porcupine', 'possum', 'rabbit', 'raccoon', 'ray', 'road', 'rocket', 'rose', 'sea', 'seal', 'shark', 'shrew', 'skunk', 'skyscraper', 'snail', 'snake', 'spider', 'squirrel', 'streetcar', 'sunflower', 'sweet_pepper', 'table', 'tank', 'telephone', 'television', 'tiger', 'tractor', 'train', 'trout', 'tulip', 'turtle', 'wardrobe', 'whale', 'willow_tree', 'wolf', 'woman', 'worm']
 
 
-def predict_image(image_path: str, temperature=1.0):
+def predict_image(request_id: str, image_path: str, start_time: datetime, temperature=1.0):
     # 이미지 로드
     img = Image.open(image_path)
 
@@ -44,7 +48,15 @@ def predict_image(image_path: str, temperature=1.0):
     probabilities = softmax(logits, temperature)
 
     # 예측된 클래스
-    predicted_class = np.argmax(probabilities)
+    predicted_class = CIFAR100_CLASSES[np.argmax(probabilities)]
 
-    return CIFAR100_CLASSES[predicted_class]
+    # 런타임 종료 시간
+    runtime = datetime.now() - start_time
+    runtime_seconds = runtime.total_seconds()
+
+    insert(request_id, image_path, predicted_class, runtime_seconds)
+    # select()
+
+    return predicted_class
+
 
