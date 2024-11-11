@@ -66,9 +66,10 @@ def delete(idx: int):
         delete_query = session.query(Inference).filter(Inference.IDX == idx)
         delete_query.delete()
         session.commit()
+        return {"status": "completed", "result": "Deletion successful"}
     except Exception as e:
         session.rollback()
-        print("Not Found Index")
+        return {"status": "error", "message": "Deletion failed"}
     finally:
         session.close()
 
