@@ -1,19 +1,19 @@
 from fastapi import FastAPI
-from backend.api.inference.onnx import OnnxController as onnx
-from backend.config.scheduleConn import start_scheduler
-from backend.api.inference.schedule import ScheduleController as schedule
+from backend.api.inference.model import model_api as model
+from backend.config.schedule_conn import start_scheduler
+from backend.api.schedule import schedule_api as schedule
+from backend.api.inference.dataset import dataset_api as dataset
 
 app = FastAPI()
-app.include_router(onnx.router)
+app.include_router(model.router)
 app.include_router(schedule.router)
+app.include_router(dataset.router)
 
-# job_thread = None
-# stop_event = threading.Event()
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "FastAPI - Inference server"}
 
 @app.on_event("startup")
 async def startup_event():
     start_scheduler(5)
-    print("Scheduler started with the app startup.")
+    print("Scheduler start")

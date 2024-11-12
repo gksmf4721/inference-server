@@ -1,16 +1,10 @@
-from apscheduler.jobstores.base import JobLookupError
-
 from fastapi import APIRouter, FastAPI
-
-from backend.config.scheduleConn import scheduler, start_scheduler, Schedule
+from backend.config.schedule_conn import scheduler, start_scheduler, Schedule
+from backend.utils.response import generate_response
 
 app = FastAPI()
 router = APIRouter()
 
-
-
-
-# 스케줄링 주기 조정
 # 스케줄링 주기 조정
 @router.post("/schedule")
 async def schedule(s: Schedule):
@@ -32,7 +26,7 @@ async def schedule(s: Schedule):
         # 새 작업 추가
         start_scheduler(cycle)  # 새 작업을 추가하는 함수
         print("New scheduled task started.")
-        return {"result": "Scheduled task added successfully."}
+        return generate_response("success", "Scheduled task added successfully.")
     except Exception as e:
-        return {"result": f"Error: {str(e)}"}
+        return generate_response("error", f"Error: {str(e)}")
 

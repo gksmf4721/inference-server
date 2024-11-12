@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Optional
-
 from numpy import double
 from sqlalchemy import Column, Integer, String, DateTime, create_engine
 from sqlalchemy.dialects.mysql import DOUBLE
